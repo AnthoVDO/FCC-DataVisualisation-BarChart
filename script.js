@@ -5,12 +5,15 @@ const CHART_WIDTH = 900;
 
 //calling API
 
-const fetchAPI = async(link) => {
-    const response = await fetch(link);
-    return await response;
-}
-
-fetchAPI(URL).then(answer=>console.log(JSON.parse(answer)))
+fetch(URL)
+    .then(res => res.json())
+    .then(data => console.log(data))
 
 
 //using D3
+
+let test = d3.select(".container__chart")
+    .append("svg")
+    .attr("height", CHART_HEIGHT)
+    .attr("width", CHART_WIDTH)
+    .style("background-color", "red")
