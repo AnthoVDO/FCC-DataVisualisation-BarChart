@@ -3,6 +3,8 @@ const URL = "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData
 const CHART_HEIGHT = 500;
 const CHART_WIDTH = 900;
 let dataset = null;
+const xScale = d3.scaleBand().rangeRound([0, CHART_WIDTH]).padding(0.1);
+const yScale = d3.scaleLinear().range([CHART_HEIGHT, 0]);
 //calling API
 
 const getData = async APIUrl => {
@@ -11,23 +13,35 @@ const getData = async APIUrl => {
     if (response.ok) {
         const dataUSA = await response.json();
 
-        const svg = d3.select(".container__chart")
+        const chartContainer = d3.select(".container__chart")
             .append("svg")
             .attr("height", CHART_HEIGHT)
             .attr("width", CHART_WIDTH)
             .style("background-color", "red")
 
-        svg.selectAll("rect")
+        xScale.domain(dataUSA.data.map(e => e[0]))
+        yScale.domain([0, d3.max(dataUSA.data, d => d[1]) + 1000])
+
+        const chart = chartContainer.append("g");
+
+        chart.selectAll(".bar")
             .data(dataUSA.data)
             .enter()
             .append("rect")
-            .attr("width", CHART_WIDTH / dataUSA.data.length)
-            .attr("height", d => CHART_HEIGHT - d[1])
-            .attr("x", d => dataUSA.data.indexOf(d))
-            .attr("y", d => CHART_HEIGHT - d[1])
-            .attr("fill", "navy")
-            .attr("class", "bar")
+            .classed("bar", true)
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => CHART_HEIGHT - yScale(d[1]))
+            .attr("x", d => xScale(d[0]))
+            .attr('y', d => yScale(d[1]));
 
+        chart.selectAll(".label")
+            .data(dataUSA.data)
+            .enter()
+            .append("text")
+            .text(d => d[1])
+
+
+        console.log(dataUSA)
 
 
 
