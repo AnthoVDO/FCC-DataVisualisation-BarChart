@@ -1,10 +1,10 @@
 //initialisation
 const URL = "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
-const CHART_HEIGHT = 500;
-const CHART_WIDTH = 900;
+const CHART_HEIGHT = 600;
+const CHART_WIDTH = 940;
 let dataset = null;
-const xScale = d3.scaleBand().rangeRound([50, CHART_WIDTH - 20]);
-const yScale = d3.scaleLinear().range([CHART_HEIGHT, 50]);
+const xScale = d3.scaleBand().range([100, CHART_WIDTH - 60]);
+const yScale = d3.scaleLinear().range([CHART_HEIGHT - 50, 150]);
 
 //calling API
 
@@ -13,10 +13,11 @@ const getData = async APIUrl => {
 
     if (response.ok) {
         const dataUSA = await response.json();
-        const abscissaScale = d3.scaleLinear().domain([1947, 2015]).range([50, CHART_WIDTH - 26]);
-        const ordinateScale = yScale.domain([0, d3.max(dataUSA.data, d => d[1]) + 1000]);
-        const abscissa = d3.axisBottom().scale(abscissaScale);
-        const ordinate = d3.axisLeft().scale(ordinateScale);
+
+
+
+        //CHART shape
+
         const chartContainer = d3.select(".container__chart")
             .append("svg")
             .attr("height", CHART_HEIGHT)
@@ -24,7 +25,7 @@ const getData = async APIUrl => {
             .style("background-color", "red")
 
         xScale.domain(dataUSA.data.map(e => e[0]))
-        yScale.domain([0, d3.max(dataUSA.data, d => d[1]) + 1000])
+        yScale.domain([0, d3.max(dataUSA.data, d => d[1])])
 
         //CHART with data
 
@@ -36,25 +37,54 @@ const getData = async APIUrl => {
             .append("rect")
             .classed("bar", true)
             .attr("width", xScale.bandwidth())
-            .attr("height", d => CHART_HEIGHT - yScale(d[1]))
+            .attr("height", d => CHART_HEIGHT - 50 - yScale(d[1]))
             .attr("x", d => xScale(d[0]))
-            .attr('y', d => yScale(d[1]) - 50);
+            .attr('y', d => yScale(d[1]) - 50)
+            .attr("data-date", d => d[0])
+            .attr("data-gdp", d => d[1])
 
 
 
         //x-axis
-
+        const abscissaScale = d3.scaleLinear().domain(["1947", "2015"]).range([100, CHART_WIDTH - 60]);
+        const abscissa = d3.axisBottom().scale(abscissaScale).tickFormat(d3.format("d"));
         const xAxis = chartContainer.append("g");
 
         xAxis.call(abscissa)
-            .attr("transform", `translate(3,${CHART_HEIGHT-50})`)
+            .attr("transform", `translate(0,${CHART_HEIGHT-100})`)
+            .attr("id", "x-axis")
 
         //y-axis
 
+        const ordinateScale = yScale.domain([0, d3.max(dataUSA.data, d => d[1])]);
+        const ordinate = d3.axisLeft().scale(ordinateScale);
         const yAxis = chartContainer.append('g');
 
         yAxis.call(ordinate)
-            .attr("transform", "translate(53, -50)");
+            .attr("transform", "translate(100, -50)")
+            .attr("id", "y-axis");
+
+        //Title
+
+        chartContainer.append("text")
+            .attr("x", CHART_WIDTH / 2)
+            .attr("y", 50)
+            .attr("text-anchor", "middle")
+            .style("font-size", "25px")
+            .style("text-decoration", "underline")
+            .attr("id", "title")
+            .text("United State GDP")
+
+        //Source
+
+        chartContainer.append("text")
+            .attr("xlink:href", dataUSA.display_url)
+            .attr("x", CHART_WIDTH / 5 * 3)
+            .attr("y", CHART_HEIGHT - 35)
+            .text(`Source: ${dataUSA.source_name}`)
+            .style("font-size", "16px")
+            .on("click", () => window.open(dataUSA.display_url))
+            .style("cursor", "pointer")
 
 
         console.log(dataUSA)
@@ -67,17 +97,3 @@ const getData = async APIUrl => {
 }
 
 getData(URL);
-
-
-//using D3
-/*
-const svg = d3.select(".container__chart")
-    .append("svg")
-    .attr("height", CHART_HEIGHT)
-    .attr("width", CHART_WIDTH)
-    .style("background-color", "red")
-
-svg.selectAll("circle")
-    .append()
-
-    */
