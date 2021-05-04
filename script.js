@@ -3,7 +3,7 @@ const URL = "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData
 const CHART_HEIGHT = 600;
 const CHART_WIDTH = 940;
 let dataset = null;
-const xScale = d3.scaleBand().range([100, CHART_WIDTH - 60]);
+const xScale = d3.scaleBand().range([100, CHART_WIDTH - 60]).paddingInner(0.8);
 const yScale = d3.scaleLinear().range([CHART_HEIGHT - 50, 150]);
 
 //calling API
@@ -46,13 +46,17 @@ const getData = async APIUrl => {
 
 
         //x-axis
-        const abscissaScale = d3.scaleLinear().domain(["1947", "2015"]).range([100, CHART_WIDTH - 60]);
-        const abscissa = d3.axisBottom().scale(abscissaScale).tickFormat(d3.format("d"));
+        const minDate = new Date("1947-January-01");
+        const maxDate = new Date("2015-July-01");
+        const parseTime = d3.timeFormat("%Y");
+        const abscissaScale = d3.scaleTime().domain([minDate, maxDate]).range([100, CHART_WIDTH - 60]);
+        const abscissa = d3.axisBottom().scale(abscissaScale).tickFormat(parseTime).ticks();
         const xAxis = chartContainer.append("g");
 
         xAxis.call(abscissa)
             .attr("transform", `translate(0,${CHART_HEIGHT-100})`)
             .attr("id", "x-axis")
+
 
         //y-axis
 
@@ -61,8 +65,8 @@ const getData = async APIUrl => {
         const yAxis = chartContainer.append('g');
 
         yAxis.call(ordinate)
-            .attr("transform", "translate(100, -50)")
-            .attr("id", "y-axis");
+            .attr("transform", "translate(99, -50)")
+            .attr("id", "y-axis")
 
         //Title
 
