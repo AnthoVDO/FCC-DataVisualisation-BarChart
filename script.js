@@ -3,7 +3,7 @@ const URL = "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData
 const CHART_HEIGHT = 600;
 const CHART_WIDTH = 940;
 let dataset = null;
-const xScale = d3.scaleBand().range([100, CHART_WIDTH - 60]).paddingInner(0.8);
+const xScale = d3.scaleBand().range([100, CHART_WIDTH - 60]).paddingInner(0.3);
 const yScale = d3.scaleLinear().range([CHART_HEIGHT - 50, 150]);
 
 //calling API
@@ -22,7 +22,8 @@ const getData = async APIUrl => {
             .append("svg")
             .attr("height", CHART_HEIGHT)
             .attr("width", CHART_WIDTH)
-            .style("background-color", "red")
+            .style("background-color", "#1e81b0")
+            .style("position", "relative")
 
         xScale.domain(dataUSA.data.map(e => e[0]))
         yScale.domain([0, d3.max(dataUSA.data, d => d[1])])
@@ -65,7 +66,7 @@ const getData = async APIUrl => {
         const yAxis = chartContainer.append('g');
 
         yAxis.call(ordinate)
-            .attr("transform", "translate(99, -50)")
+            .attr("transform", "translate(100, -50)")
             .attr("id", "y-axis")
 
         //Title
@@ -89,6 +90,47 @@ const getData = async APIUrl => {
             .style("font-size", "16px")
             .on("click", () => window.open(dataUSA.display_url))
             .style("cursor", "pointer")
+            .attr("class", "Source")
+
+        //Ordinate legend
+
+        chartContainer.append("text")
+            .text("Gross Domestic Product in Billions of Dollars")
+            .attr("x", -400)
+            .attr("y", 40)
+            .style("font-size", "16px")
+            .style("transform", "rotate(-90deg)")
+            .attr("class", "ordinateLegend")
+
+        //ToolTip
+
+        const tooltip = d3.select(".container__chart")
+            .append("div")
+            .style("position", "absolute")
+            .style("top", CHART_HEIGHT / 2 + "px")
+            .attr("id", "tooltip")
+            .style("background-color", "orange")
+            .style("padding", "20px")
+            .style("border-radius", "5px")
+            .style("opacity", "0")
+
+        d3.selectAll(".bar")
+            .on("mouseover", (e) => {
+                tooltip.style("opacity", "1")
+                    .style("left", `${e.pageX-d3.select("#tooltip").node().offsetWidth/2}px`)
+                    .html(`${e.path[0].dataset.date}: </br> ${e.path[0].dataset.gdp} Billions Dollars`)
+                    .attr("data-date", `${e.path[0].dataset.date}`)
+                d3.select(e.path[0]).style("fill", "green")
+
+            })
+            .on("mouseout", (e) => {
+                tooltip.style("opacity", "0")
+                d3.select(e.path[0]).style("fill", "black")
+            })
+
+
+
+
 
 
         console.log(dataUSA)
