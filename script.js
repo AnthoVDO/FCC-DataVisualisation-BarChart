@@ -118,14 +118,14 @@ const getData = async APIUrl => {
             .on("mouseover", (e) => {
                 tooltip.style("opacity", "1")
                     .style("left", `${e.pageX-d3.select("#tooltip").node().offsetWidth/2}px`)
-                    .html(`${e.path[0].dataset.date}: </br> ${e.path[0].dataset.gdp} Billions Dollars`)
-                    .attr("data-date", `${e.path[0].dataset.date}`)
-                d3.select(e.path[0]).style("fill", "green")
+                    .html(`${e.currentTarget.dataset.date}: </br> ${e.currentTarget.dataset.gdp} Billions Dollars`)
+                    .attr("data-date", `${e.currentTarget.dataset.date}`)
+                d3.select(e.currentTarget).style("fill", "green")
 
             })
             .on("mouseout", (e) => {
                 tooltip.style("opacity", "0")
-                d3.select(e.path[0]).style("fill", "black")
+                d3.select(e.currentTarget).style("fill", "black")
             })
 
 
